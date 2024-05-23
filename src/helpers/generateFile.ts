@@ -19,8 +19,12 @@ export const generateFile = (
 
   const result = printer.printFile(file);
 
-  const leader = `import type { ColumnType${
+  const leader = `import { ColumnType${
     result.includes("GeneratedAlways") ? ", GeneratedAlways" : ""
+  }${
+    result.includes("RawBuilder") ? ", RawBuilder" : ""
+  }${
+    result.includes("sql") ? ", sql" : ""
   } } from "kysely";
 export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
   ? ColumnType<S, I | undefined, U>

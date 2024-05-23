@@ -13,6 +13,7 @@ import { writeFileSafely } from "~/utils/writeFileSafely";
 
 import { generateEnumType } from "./helpers/generateEnumType";
 import { convertToMultiSchemaModels } from "./helpers/multiSchemaHelpers";
+import { generateEnumCast } from "~/helpers/generateEnumCast";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { version } = require("../package.json");
@@ -36,6 +37,8 @@ generatorHandler({
     const enums = options.dmmf.datamodel.enums.flatMap(({ name, values }) => {
       return generateEnumType(name, values);
     });
+
+    const enumCast = generateEnumCast(options.dmmf.datamodel.enums);
 
     // Generate DMMF models for implicit many to many tables
     //
@@ -68,6 +71,7 @@ generatorHandler({
       modelDefinitions: models.map((m) => m.definition),
       enumNames: options.dmmf.datamodel.enums.map((e) => e.name),
       enums,
+      enumCast,
       enumsOutfile: config.enumFileName,
       typesOutfile: config.fileName,
     });

@@ -1,5 +1,5 @@
 import path from "path";
-import type { TypeAliasDeclaration, VariableStatement } from "typescript";
+import type { FunctionDeclaration, TypeAliasDeclaration, VariableStatement } from "typescript";
 
 import { generateFile } from "~/helpers/generateFile";
 
@@ -8,6 +8,7 @@ type File = { filepath: string; content: ReturnType<typeof generateFile> };
 export function generateFiles(opts: {
   typesOutfile: string;
   enums: (VariableStatement | TypeAliasDeclaration)[];
+  enumCast: (VariableStatement | TypeAliasDeclaration | FunctionDeclaration)[];
   enumNames: string[];
   enumsOutfile: string;
   databaseType: TypeAliasDeclaration;
@@ -18,12 +19,12 @@ export function generateFiles(opts: {
     const typesFileWithEnums: File = {
       filepath: opts.typesOutfile,
       content: generateFile(
-        [...opts.enums, ...opts.modelDefinitions, opts.databaseType],
+        [...opts.enums, ...opts.enumCast, ...opts.modelDefinitions, opts.databaseType],
         {
           withEnumImport: false,
-          withLeader: true,
+          withLeader: true
         }
-      ),
+      )
     };
 
     return [typesFileWithEnums];
@@ -34,20 +35,20 @@ export function generateFiles(opts: {
     content: generateFile([...opts.modelDefinitions, opts.databaseType], {
       withEnumImport: {
         importPath: `./${path.parse(opts.enumsOutfile).name}`,
-        names: opts.enumNames,
+        names: opts.enumNames
       },
-      withLeader: true,
-    }),
+      withLeader: true
+    })
   };
 
   if (opts.enums.length === 0) return [typesFileWithoutEnums];
 
   const enumFile: File = {
     filepath: opts.enumsOutfile,
-    content: generateFile(opts.enums, {
+    content: generateFile([...opts.enums, ...opts.enumCast], {
       withEnumImport: false,
-      withLeader: false,
-    }),
+      withLeader: true
+    })
   };
 
   return [typesFileWithoutEnums, enumFile];
