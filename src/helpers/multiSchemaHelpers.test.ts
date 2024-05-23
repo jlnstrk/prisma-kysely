@@ -1,6 +1,9 @@
 import { expect, test } from "vitest";
 
-import { convertToMultiSchemaModels } from "./multiSchemaHelpers";
+import {
+  buildMultiSchemaMap,
+  convertToMultiSchemaModels,
+} from "./multiSchemaHelpers";
 
 const testDataModel = `generator kysely {
   provider        = "node ./dist/bin.js"
@@ -35,7 +38,8 @@ test("returns a list of models with schemas appended to the table name", () => {
     { typeName: "Eagle", tableName: "eagles" },
   ];
 
-  const result = convertToMultiSchemaModels(initialModels, testDataModel);
+  const multiSchemaMap = buildMultiSchemaMap(testDataModel);
+  const result = convertToMultiSchemaModels(multiSchemaMap, initialModels);
 
   expect(result).toEqual([
     { typeName: "Elephant", tableName: "mammals.elephants" },
