@@ -20,6 +20,8 @@ export const generateFile = (
   const result = printer.printFile(file);
 
   const leader = `import { ColumnType${
+    result.includes("ExpressionWrapper") ? ", ExpressionWrapper" : ""
+  }${
     result.includes("GeneratedAlways") ? ", GeneratedAlways" : ""
   }${
     result.includes("RawBuilder") ? ", RawBuilder" : ""

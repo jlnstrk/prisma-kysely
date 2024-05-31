@@ -5,7 +5,7 @@ import isValidTSIdentifier from "~/utils/isValidTSIdentifier";
 
 import { generateTypedReferenceNode } from "./generateTypedReferenceNode";
 
-export const generateEnumCast = (enums: DMMF.DatamodelEnum[]) => {
+export const generateEnumCastHelper = (enums: DMMF.DatamodelEnum[]) => {
   if (!enums.length) return [];
 
   const namesObjectDeclaration = ts.factory.createVariableStatement(
@@ -73,13 +73,26 @@ export const generateEnumCast = (enums: DMMF.DatamodelEnum[]) => {
     )
   );
 
-  const valueTypeParameterDeclaration = ts.factory.createTypeParameterDeclaration([], "Value", ts.factory.createTypeReferenceNode(valuesTypeDeclaration.name, [
-      ts.factory.createTypeReferenceNode(nameTypeParameterDeclaration.name)
+  const valueTypeParameterDeclaration = ts.factory.createTypeParameterDeclaration([], "Value",
+    ts.factory.createUnionTypeNode([
+      ts.factory.createTypeReferenceNode(valuesTypeDeclaration.name, [
+        ts.factory.createTypeReferenceNode(nameTypeParameterDeclaration.name)
+      ]),
+      ts.factory.createLiteralTypeNode(ts.factory.createNull()),
+      ts.factory.createKeywordTypeNode(ts.SyntaxKind.UndefinedKeyword)
     ])
   );
 
   const nameParameterDeclaration = ts.factory.createParameterDeclaration([], undefined, "name", undefined, ts.factory.createTypeReferenceNode(nameTypeParameterDeclaration.name));
-  const valueParameterDeclaration = ts.factory.createParameterDeclaration([], undefined, "value", undefined, ts.factory.createTypeReferenceNode(valueTypeParameterDeclaration.name));
+  const valueParameterDeclaration = ts.factory.createParameterDeclaration([], undefined, "value", undefined,
+    ts.factory.createUnionTypeNode([
+      ts.factory.createTypeReferenceNode(valueTypeParameterDeclaration.name),
+      ts.factory.createTypeReferenceNode("ExpressionWrapper", [
+        ts.factory.createTypeReferenceNode("any"),
+        ts.factory.createTypeReferenceNode("any"),
+        ts.factory.createTypeReferenceNode(valueTypeParameterDeclaration.name)
+      ])
+    ]));
 
   const castEnumValueFunctionDeclaration = ts.factory.createFunctionDeclaration(
     [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)], undefined, "castEnumValue", [

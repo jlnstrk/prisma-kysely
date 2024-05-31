@@ -8,7 +8,7 @@ type File = { filepath: string; content: ReturnType<typeof generateFile> };
 export function generateFiles(opts: {
   typesOutfile: string;
   enums: (VariableStatement | TypeAliasDeclaration)[];
-  enumCast: (VariableStatement | TypeAliasDeclaration | FunctionDeclaration)[];
+  enumCastHelper: (VariableStatement | TypeAliasDeclaration | FunctionDeclaration)[];
   enumNames: string[];
   enumsOutfile: string;
   databaseType: TypeAliasDeclaration;
@@ -19,7 +19,7 @@ export function generateFiles(opts: {
     const typesFileWithEnums: File = {
       filepath: opts.typesOutfile,
       content: generateFile(
-        [...opts.enums, ...opts.enumCast, ...opts.modelDefinitions, opts.databaseType],
+        [...opts.enums, ...opts.enumCastHelper, ...opts.modelDefinitions, opts.databaseType],
         {
           withEnumImport: false,
           withLeader: true
@@ -45,7 +45,7 @@ export function generateFiles(opts: {
 
   const enumFile: File = {
     filepath: opts.enumsOutfile,
-    content: generateFile([...opts.enums, ...opts.enumCast], {
+    content: generateFile([...opts.enums, ...opts.enumCastHelper], {
       withEnumImport: false,
       withLeader: true
     })
